@@ -4,12 +4,17 @@ from db_connection import get_connection, release_connection
 def add_user(add_username, add_password):
     conn = get_connection()
     cur = conn.cursor()
-
-    query = "INSERT INTO users (username, password) VALUES (%s, %s)"
-    cur.execute (query, (add_username, add_password))
-    conn.commit()
-
-    release_connection()
+    query1 = "SELECT 1 FROM users WHERE username = %s"
+    cur.execute (query1, (add_username, ))
+    if cur.fetchone():
+        return "Username already in use!\n Please enter another"
+        
+    else:
+        query = "INSERT INTO users (username, password_hash) VALUES (%s, %s)"
+        cur.execute (query, (add_username, add_password))
+        conn.commit()
+        release_connection(conn)
+        return f"Signup successful! Welcome {add_username}"
 
 
 #AUTHENTICATE THE USER'S IDENTITY
@@ -17,20 +22,15 @@ def authenticate_user(auth_username, auth_password):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute ("SELECT username FROM users")
-    name =  cur.fetchone()
-    cur.execute ("SELECT password FROM users")
-    passw = cur.fetchone()
-
-    if name == auth_username and passw == auth_password:
-        add_user(auth_username, auth_password)
-        print ("You are successfully logged in!")
-        print (f"Welcome back {auth_username}")
+    query = "SELECT password_hash FROM users WHERE username = %s"
+    cur.execute (query, (auth_username, ))
+    row = cur.fetchone()
+    release_connection(conn)
+    if row and row[0] == auth_password:
+        return f"Login successful! \nWelcome back {auth_username}"
     else:
-        print("Incorrect username or password! ")
-        print("Sorry, we couldn't log you in! ")
+        return "Login unsuccessful! Incorrect username or password! "
 
-    release_connection()
 
 
 #SHOW ONLINE USERS
@@ -43,7 +43,7 @@ def show_online_users():
     for users in online_users:
         print (users)
 
-    release_connection()
+    release_connection(conn)
 
 
 #SHOW ALL REGISTERED USERS
@@ -56,4 +56,7 @@ def show_all_users():
     for users in all_users:
         print (users)
 
-    release_connection()
+    release_connection(conn)
+
+
+

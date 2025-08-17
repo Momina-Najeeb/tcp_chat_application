@@ -24,7 +24,7 @@ except:
 
 def get_connection():
     try:
-        db_pool.getconn()
+        return db_pool.getconn()
     except:
         print("Failed to get database connection!")
         raise SystemExit("Exiting...")
