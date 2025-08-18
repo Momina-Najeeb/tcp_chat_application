@@ -53,9 +53,29 @@ def show_all_users():
 
     cur.execute ("SELECT username, online_status, last_seen FROM users")
     all_users = cur.fetchall()
-    for users in all_users:
-        print (users)
+    release_connection(conn)
+    return all_users
 
+
+#GET USER ID FROM THE DATABASE
+def get_user_id(username):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE username = %s", (username,))
+    result = cur.fetchone()
+    release_connection(conn)
+    if result:
+        return result[0]
+    else:
+        None
+
+
+#UPDTAE USER ONLINE STATUS
+def update_user_online_status(username, status):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET online_status = %s WHERE username = %s", (status, username))
+    conn.commit()
     release_connection(conn)
 
 

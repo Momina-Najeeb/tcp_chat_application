@@ -50,4 +50,40 @@ while True:
 
     else:
         print("Enter a valid choice!")
+
+
+choice2 = input (""" Choose 1, 2, 3, 4:
+                 1. Show Online Users
+                 2. Show all users
+                 3. Chat
+                 4. Exit
+                 """)
+
+if choice2 == "1":
+    client.send("SHOW_ONLINE_USERS".encode())
+    response = client.recv(1024).decode()
+    print("Online Users:")
+    print(response)
+
+elif choice2 == "2":
+    client.send("SHOW_ALL_USERS")
+    response = client.recv(1024).decode()
+    print("All registered users:\n")
+    print(response)
+
+if choice2 == "3":
+    client.send("CHAT".encode())
+    client.send(username)
+    recipient = input("Enter recipient username: ")
+    client.send(recipient.encode())
+    message = input("Enter your message: ")
+    client.send(message.encode())
+    print("Message sent!")
+
+
+    
+
+
+
+
 client.close()
