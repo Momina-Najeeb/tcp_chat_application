@@ -1,4 +1,4 @@
-from db_connection import get_connection, release_connection
+from .db_connection import get_connection, release_connection
 
 #ADD USER INFORMATION TO THE DATABASE
 def add_user(add_username, add_password):
@@ -40,10 +40,11 @@ def show_online_users():
 
     cur.execute("SELECT username FROM users WHERE online_status = true")
     online_users = cur.fetchall()
-    for users in online_users:
-        print (users)
-
     release_connection(conn)
+    if online_users:
+        return online_users
+    else:
+        return []
 
 
 #SHOW ALL REGISTERED USERS
@@ -54,7 +55,10 @@ def show_all_users():
     cur.execute ("SELECT username, online_status, last_seen FROM users")
     all_users = cur.fetchall()
     release_connection(conn)
-    return all_users
+    if all_users:
+        return all_users
+    else:
+        return []
 
 
 #GET USER ID FROM THE DATABASE
@@ -79,4 +83,11 @@ def update_user_online_status(username, status):
     release_connection(conn)
 
 
-
+#GET USER INFO
+def get_user_info(username):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT username, online_status, last_seen FROM users WHERE username = %s", (username,))
+    result = cur.fetchone()
+    release_connection(conn)
+    return result
