@@ -51,7 +51,7 @@ def authentication(client):
             client.send("EXIT".encode())
             print("Exiting...")
             client.close()
-            break
+            exit()
 
         else:
             print("Enter a valid choice!")

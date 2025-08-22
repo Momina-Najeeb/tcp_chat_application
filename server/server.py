@@ -1,7 +1,7 @@
 import socket
 import threading
 import sys
-from database.users import authenticate_user, add_user, show_online_users, show_all_users, get_user_id, update_user_online_status, get_user_info
+from database.users import authenticate_user, add_user, show_online_users, show_all_users, get_user_id, update_user_online_status, get_user_info, update_user_last_seen
 from database.messages import save_message, show_inbox
 
 def start_server(host, port):
@@ -66,6 +66,8 @@ def handle_client(client, address):
                 
             elif auth == "EXIT":
                 print (f"client address {address} disconnected!")
+                update_user_online_status(username, False)
+                update_user_last_seen(username)
                 client.close()
                 break
 
@@ -130,10 +132,11 @@ def handle_client(client, address):
                     inbox_str = "\n".join([f"{sender}: {msg}" for sender, msg in inbox])
                     client.send(inbox_str.encode())
                 else:
-                    client.send("".encode())
+                    client.send("Your inbox is empty! ".encode())
             elif choice == "EXIT":
                 print(f"{username} has disconnected.")
                 update_user_online_status(username, False)
+                update_user_last_seen(username)
                 client.close()
                 logged_in = False
                 break
