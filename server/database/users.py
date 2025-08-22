@@ -83,6 +83,15 @@ def update_user_online_status(username, status):
     release_connection(conn)
 
 
+    #GET USER LAST SEEN TIME
+def update_user_last_seen(username):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET last_seen = NOW() WHERE username = %s", (username,))
+    conn.commit()
+    release_connection(conn)
+
+
 #GET USER INFO
 def get_user_info(username):
     conn = get_connection()
